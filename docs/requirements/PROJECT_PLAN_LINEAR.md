@@ -72,7 +72,7 @@ M2-4 Reconnect and health,Reconnect logic + health checks,M2 WebRTC Streaming,To
 M3-1 RTSP endpoint,Expose RTSP stream for VLC,M3 RTSP Streaming,Todo,High,3,streaming,M1-2
 M3-2 Mode validation,Selectable or parallel WebRTC/RTSP,M3 RTSP Streaming,Todo,Medium,2,streaming,M3-1
 M3-3 RTSP docs,Usage instructions for VLC/ffplay,M3 RTSP Streaming,Todo,Low,1,docs,M3-2
-M4-1 Config + CLI,Single config file and flags,M4 Reliability, Config, and Ops,Todo,High,3,ops,"M2-4;M3-2"
+M4-1 Config + CLI,Single config file and flags,M4 Reliability, Config, and Ops,Todo,High,3,ops,M2-4;M3-2
 M4-2 Health + logging,Health endpoint and improved logs,M4 Reliability, Config, and Ops,Todo,Medium,2,ops,M4-1
 M4-3 Basic security,RTSP auth + WebRTC security config,M4 Reliability, Config, and Ops,Todo,High,3,security,M4-2
 M5-1 Update ARC42 and ADRs,Architecture docs update,M5 Documentation and Handoff,Todo,Medium,2,docs,M4-3
