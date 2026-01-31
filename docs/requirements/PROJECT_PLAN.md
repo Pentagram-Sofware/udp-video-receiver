@@ -62,8 +62,8 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - M1 depends on M0 decisions.
 - M2 depends on M1 capture/encode pipeline.
 - M3 can start after M1, finalize after M2 decisions.
-- M4 depends on stable M2/M3 behavior.
-- M5 depends on all prior milestones.
+- M4 depends on stable M2 and M3 behavior.
+- M5 depends on M4 completion.
 
 ## Risks and Mitigations
 - HW encoder availability: validate on Pi 5 early (M0).
