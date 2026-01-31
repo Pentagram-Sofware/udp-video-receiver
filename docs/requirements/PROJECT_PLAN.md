@@ -1,0 +1,85 @@
+# Project Plan (TPM)
+
+This plan translates the rough timeline into milestones, deliverables,
+dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
+
+## Timeline Overview
+- M0: Decisions and Setup (Days 1-2)
+- M1: Capture and Encode (Days 3-7)
+- M2: WebRTC Streaming (Days 8-15)
+- M3: RTSP Streaming (Days 16-20)
+- M4: Reliability, Config, and Ops (Days 21-24)
+- M5: Documentation and Handoff (Days 25-26)
+
+## Milestones and Deliverables
+
+### M0: Decisions and Setup (Days 1-2)
+- Confirm encoder path and toolchain (Picamera2 + HW H.264).
+- Choose WebRTC stack (GStreamer `webrtcbin` vs `aiortc`).
+- Choose RTSP server approach (`mediamtx` vs GStreamer RTSP server).
+- Deliverables:
+  - Decision log (stack choices)
+  - Environment setup checklist
+
+### M1: Capture and Encode (Days 3-7)
+- Implement Picamera2 capture with configurable FPS/resolution.
+- Add H.264 encoder config (bitrate/profile/GOP).
+- Add logging for FPS/bitrate/encoder status.
+- Deliverables:
+  - Local Pi pipeline producing H.264 stream
+  - Configurable capture/encode settings
+
+### M2: WebRTC Streaming (Days 8-15)
+- Build WebRTC pipeline on Pi.
+- Implement minimal signaling server.
+- Create browser client for playback.
+- Add reconnect logic and basic health checks.
+- Deliverables:
+  - Browser playback over LAN/WAN
+  - Signaling service and client demo
+
+### M3: RTSP Streaming (Days 16-20)
+- Stand up RTSP endpoint for VLC/ffplay.
+- Validate parallel or selectable WebRTC/RTSP modes.
+- Deliverables:
+  - RTSP compatibility and usage instructions
+
+### M4: Reliability, Config, and Ops (Days 21-24)
+- Add config file + CLI flags.
+- Add health endpoint and logging improvements.
+- Add basic security (RTSP auth, WebRTC DTLS/SRTP).
+- Deliverables:
+  - MVP-ready operational controls
+  - Basic security configuration
+
+### M5: Documentation and Handoff (Days 25-26)
+- Update `docs/architecture/ARC42.md` and ADRs.
+- Add deployment instructions + usage examples.
+- Deliverables:
+  - Final docs and release checklist
+
+## Dependencies
+- M1 depends on M0 decisions.
+- M2 depends on M1 capture/encode pipeline.
+- M3 can start after M1, finalize after M2 decisions.
+- M4 depends on stable M2/M3 behavior.
+- M5 depends on all prior milestones.
+
+## Risks and Mitigations
+- HW encoder availability: validate on Pi 5 early (M0).
+- WebRTC complexity: keep signaling minimal; use known GStreamer examples.
+- WAN variability: add reconnection logic and log metrics.
+
+## Status Update Template (TPM)
+
+**Date:** YYYY-MM-DD  
+**Milestone:** Mx  
+**Status:** On Track / At Risk / Blocked  
+**Completed This Period:**
+- ...
+**Planned Next:**
+- ...
+**Risks / Issues:**
+- ...
+**Decisions Needed:**
+- ...
