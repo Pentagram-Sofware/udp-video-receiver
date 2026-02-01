@@ -25,6 +25,7 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - Implement Picamera2 capture with configurable FPS/resolution.
 - Add H.264 encoder config (bitrate/profile/GOP).
 - Add logging for FPS/bitrate/encoder status.
+- Add unit tests for capture/encode configuration and logging.
 - Deliverables:
   - Local Pi pipeline producing H.264 stream
   - Configurable capture/encode settings
@@ -35,6 +36,7 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - Validate iOS playback (AVPlayer) and browser playback.
 - Validate LAN playback and latency before client integration.
 - Validate WAN playback and latency before client integration.
+- Create an integration test checklist for HLS playback and latency.
 - Deliverables:
   - LL-HLS playback over LAN/WAN
   - Nginx config and HLS output
@@ -44,6 +46,7 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - Implement minimal signaling server.
 - Create browser client for playback.
 - Add reconnect logic and basic health checks.
+- Create an integration test checklist for WebRTC playback and reconnect.
 - Deliverables:
   - Browser playback over LAN/WAN
   - Signaling service and client demo
@@ -52,6 +55,7 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - Add config file + CLI flags.
 - Add health endpoint and logging improvements.
 - Add basic security (HTTPS/TLS for HLS, WebRTC DTLS/SRTP).
+- Enforce unit tests for dev tickets in CI and review checklist.
 - Deliverables:
   - MVP-ready operational controls
   - Basic security configuration
@@ -74,6 +78,11 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - HLS latency tuning: use LL-HLS presets and measure end-to-end delay.
 - WebRTC complexity: keep signaling minimal; use known GStreamer examples.
 - WAN variability: add reconnection logic and log metrics.
+
+## Quality and Review Requirements
+- Dev tickets require unit tests for new logic or behavior changes.
+- Integration tests are defined and owned by QA for end-to-end playback validation.
+- Reviews must verify unit tests exist and pass before approval.
 
 ## Status Update Template (TPM)
 
