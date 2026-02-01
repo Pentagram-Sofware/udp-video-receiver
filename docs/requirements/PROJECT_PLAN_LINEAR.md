@@ -28,6 +28,8 @@ with Issues (tasks) and explicit dependencies.
 - M2-1 LL-HLS pipeline on Pi (segmenter + playlist)
 - M2-2 Configure Nginx for playlists and segments
 - M2-3 Validate iOS playback (AVPlayer) and browser playback
+- M2-4 Validate LAN playback and latency
+- M2-5 Validate WAN playback and latency
 
 ### M3 WebRTC Streaming
 - M3-1 WebRTC pipeline on Pi (RTP/DTLS/SRTP)
@@ -68,11 +70,13 @@ M1-3 Encoder metrics logging,FPS/bitrate/status logging,M1 Capture and Encode,To
 M2-1 LL-HLS pipeline,Segmenter and playlist generation on Pi,M2 HLS Streaming,Todo,High,5,streaming,M1-2
 M2-2 Nginx HLS serving,Serve playlists and segments via Nginx,M2 HLS Streaming,Todo,High,3,ops,M2-1
 M2-3 iOS + web playback,Validate AVPlayer and browser playback,M2 HLS Streaming,Todo,High,3,frontend,M2-2
+M2-4 LAN validation,Validate LAN playback and latency,M2 HLS Streaming,Todo,Medium,2,qa,M2-3
+M2-5 WAN validation,Validate WAN playback and latency,M2 HLS Streaming,Todo,Medium,2,qa,M2-4
 M3-1 WebRTC pipeline,RTP + SRTP/DTLS pipeline on Pi,M3 WebRTC Streaming,Todo,High,5,streaming,M1-2
 M3-2 Signaling server,Minimal signaling for browser client,M3 WebRTC Streaming,Todo,High,3,backend,M3-1
 M3-3 Browser client,Basic HTML/JS playback,M3 WebRTC Streaming,Todo,High,3,frontend,M3-2
 M3-4 Reconnect and health,Reconnect logic + health checks,M3 WebRTC Streaming,Todo,Medium,2,observability,M3-3
-M4-1 Config + CLI,Single config file and flags,M4 Reliability, Config, and Ops,Todo,High,3,ops,M2-3;M3-4
+M4-1 Config + CLI,Single config file and flags,M4 Reliability, Config, and Ops,Todo,High,3,ops,M2-5;M3-4
 M4-2 Health + logging,Health endpoint and improved logs,M4 Reliability, Config, and Ops,Todo,Medium,2,ops,M4-1
 M4-3 Basic security,HTTPS/TLS for HLS + WebRTC security config,M4 Reliability, Config, and Ops,Todo,High,3,security,M4-2
 M5-1 Update ARC42 and ADRs,Architecture docs update,M5 Documentation and Handoff,Todo,Medium,2,docs,M4-3

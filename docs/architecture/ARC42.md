@@ -61,6 +61,9 @@ flowchart LR
 - Nginx serves playlists and segments over HTTP(S)
 - Capture metrics for FPS/bitrate and streaming health
 
+### HLS Reference
+- Details: `docs/architecture/HLS.md`
+
 ## 5. Building Block View
 
 ### 5.1 Level 1 (System Overview)

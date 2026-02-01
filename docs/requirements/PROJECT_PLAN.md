@@ -33,6 +33,8 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 - Build LL-HLS pipeline on Pi (segmenter + playlist).
 - Configure Nginx to serve playlists and segments.
 - Validate iOS playback (AVPlayer) and browser playback.
+- Validate LAN playback and latency before client integration.
+- Validate WAN playback and latency before client integration.
 - Deliverables:
   - LL-HLS playback over LAN/WAN
   - Nginx config and HLS output
