@@ -6,8 +6,8 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 ## Timeline Overview
 - M0: Decisions and Setup (Days 1-2)
 - M1: Capture and Encode (Days 3-7)
-- M2: WebRTC Streaming (Days 8-15)
-- M3: RTSP Streaming (Days 16-20)
+- M2: HLS Streaming (Days 8-15)
+- M3: WebRTC Streaming (Days 16-20)
 - M4: Reliability, Config, and Ops (Days 21-24)
 - M5: Documentation and Handoff (Days 25-26)
 
@@ -15,8 +15,8 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 
 ### M0: Decisions and Setup (Days 1-2)
 - Confirm encoder path and toolchain (Picamera2 + HW H.264).
-- Choose WebRTC stack (GStreamer `webrtcbin` vs `aiortc`).
-- Choose RTSP server approach (`mediamtx` vs GStreamer RTSP server).
+- Choose HLS stack (LL-HLS segmenter and HTTP server).
+- Choose WebRTC stack (GStreamer `webrtcbin` vs `aiortc`) for follow-on.
 - Deliverables:
   - Decision log (stack choices)
   - Environment setup checklist
@@ -29,7 +29,15 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
   - Local Pi pipeline producing H.264 stream
   - Configurable capture/encode settings
 
-### M2: WebRTC Streaming (Days 8-15)
+### M2: HLS Streaming (Days 8-15)
+- Build LL-HLS pipeline on Pi (segmenter + playlist).
+- Configure Nginx to serve playlists and segments.
+- Validate iOS playback (AVPlayer) and browser playback.
+- Deliverables:
+  - LL-HLS playback over LAN/WAN
+  - Nginx config and HLS output
+
+### M3: WebRTC Streaming (Days 16-20)
 - Build WebRTC pipeline on Pi.
 - Implement minimal signaling server.
 - Create browser client for playback.
@@ -38,16 +46,10 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
   - Browser playback over LAN/WAN
   - Signaling service and client demo
 
-### M3: RTSP Streaming (Days 16-20)
-- Stand up RTSP endpoint for VLC/ffplay.
-- Validate parallel or selectable WebRTC/RTSP modes.
-- Deliverables:
-  - RTSP compatibility and usage instructions
-
 ### M4: Reliability, Config, and Ops (Days 21-24)
 - Add config file + CLI flags.
 - Add health endpoint and logging improvements.
-- Add basic security (RTSP auth, WebRTC DTLS/SRTP).
+- Add basic security (HTTPS/TLS for HLS, WebRTC DTLS/SRTP).
 - Deliverables:
   - MVP-ready operational controls
   - Basic security configuration
@@ -67,6 +69,7 @@ dependencies, and reporting expectations for the Raspberry Pi Camera Streamer.
 
 ## Risks and Mitigations
 - HW encoder availability: validate on Pi 5 early (M0).
+- HLS latency tuning: use LL-HLS presets and measure end-to-end delay.
 - WebRTC complexity: keep signaling minimal; use known GStreamer examples.
 - WAN variability: add reconnection logic and log metrics.
 

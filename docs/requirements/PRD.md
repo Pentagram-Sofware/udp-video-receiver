@@ -45,9 +45,10 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 3. **Transport / Streaming**
    - Streaming originates on the Raspberry Pi.
    - Provide standard protocols that align with native playback stacks:
-     - **WebRTC** for real-time browser playback.
      - **HLS (prefer Low-Latency HLS)** for native iOS playback.
+     - **WebRTC** for real-time browser playback.
    - Allow selecting transport at runtime and enable simultaneous outputs.
+   - Serve HLS from a local HTTP server (start with Nginx).
 4. **Client Playback**
    - iOS: Playable in native AVFoundation/AVPlayer.
    - Web: Playable in standard browser media APIs (WebRTC, HTML5 video).
@@ -60,7 +61,8 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 
 ## Non-Functional Requirements
 1. **Latency**
-   - Target < 500 ms end-to-end in LAN conditions.
+   - WebRTC: target < 500 ms end-to-end in LAN conditions.
+   - HLS: target 2-4 s end-to-end with Low-Latency HLS.
 2. **Reliability**
    - Recover from temporary network dropouts without crashing.
 3. **Security**
@@ -89,7 +91,7 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 2. **Standard Video Encoding**
    - Current design uses JPEG-per-frame, which is bandwidth heavy.
 3. **Streaming Protocol Support**
-   - No RTSP/WebRTC pipeline; current code uses custom UDP chunks.
+   - No HLS/WebRTC pipeline; current code uses custom UDP chunks.
 4. **Network Robustness**
    - No FEC/retransmit or jitter buffer for WAN.
 5. **Security**
@@ -100,7 +102,6 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
    - No hook or interface to branch frames for future AI processing.
 
 ## Open Questions
-- Preferred streaming protocol for MVP: RTSP or WebRTC?
-- Required latency budget (real-time vs. near-real-time)?
-- Is VLC compatibility sufficient, or do we need a browser-based client?
+- Preferred HLS server stack (Nginx or Caddy)?
+- WebRTC timeline: MVP or follow-on?
 
