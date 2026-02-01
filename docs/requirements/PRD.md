@@ -10,11 +10,16 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 - **Camera/Platform**: Raspberry Pi 5 + Pi Camera v2.1
 - **Capture Stack**: Picamera2 is referenced in project docs
 
+## Data Points
+- **Stream Origin**: Video streaming starts on the Raspberry Pi.
+- **Primary Clients**: iOS app (real-time video) and web client.
+- **Client Preference**: Use standard, native playback stacks over custom protocols.
+
 ## Goals
 - Capture live video from the Pi Camera v2.1 on Raspberry Pi 5.
 - Encode video with an efficient, standard codec suitable for internet streaming.
 - Stream over common protocols with reasonable latency and robustness.
-- Provide a receiver client or standard player compatibility.
+- Provide standard player compatibility for iOS and web clients.
 
 ## Non-Goals
 - Implement advanced video analytics or AI inference.
@@ -38,11 +43,14 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
    - Encode using **H.264/AVC** (baseline or main profile).
    - Configurable bitrate, keyframe interval, and profile.
 3. **Transport / Streaming**
-   - Provide at least one standard streaming protocol:
-     - **RTSP (RTP over UDP/TCP)** OR **WebRTC**.
-   - Allow selecting transport at runtime.
+   - Streaming originates on the Raspberry Pi.
+   - Provide standard protocols that align with native playback stacks:
+     - **WebRTC** for real-time browser playback.
+     - **HLS (prefer Low-Latency HLS)** for native iOS playback.
+   - Allow selecting transport at runtime and enable simultaneous outputs.
 4. **Client Playback**
-   - Stream playable in standard players (e.g., VLC for RTSP).
+   - iOS: Playable in native AVFoundation/AVPlayer.
+   - Web: Playable in standard browser media APIs (WebRTC, HTML5 video).
    - Provide a simple receiver/preview client (CLI is acceptable).
 5. **Configuration**
    - Single config file (YAML/JSON) or CLI flags for camera + encoding + transport.
