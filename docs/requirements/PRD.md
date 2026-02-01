@@ -65,8 +65,8 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
    - Recover from temporary network dropouts without crashing.
 3. **Security**
    - If internet-exposed, provide at least one of:
-     - Password-protected RTSP
      - DTLS/SRTP in WebRTC
+     - HTTPS/TLS for HLS delivery (and signed URLs if exposed)
 4. **Resource Usage**
    - Prefer hardware-accelerated encoding to keep CPU < 50% on Pi 5.
 5. **Extensibility**
