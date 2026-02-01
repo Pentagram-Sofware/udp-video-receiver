@@ -132,8 +132,8 @@ Use ADR entries for significant changes:
 - LL-HLS target latency: 2-4 s end-to-end
 
 ### 10.2 Reliability
-- Drop incomplete frames on packet loss
-- Tolerate duplicate chunks
+- Retry failed segment downloads and resume playback after reconnect
+- Handle incomplete or stale HLS segments by reloading the playlist
 
 ### 10.3 Security
 - HTTPS/TLS for HLS delivery when exposed
