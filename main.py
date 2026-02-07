@@ -15,10 +15,11 @@ from collections import defaultdict
 class UDPVideoClient:
     """Client for client-server UDP streaming"""
     
-    def __init__(self, server_host, server_port=9999, client_port=9999):
+    def __init__(self, server_host, server_port=9999, client_port=9999, stream_format="jpeg_pickle"):
         self.server_host = server_host
         self.server_port = server_port
         self.client_port = client_port  # 0 = auto-assign
+        self.stream_format = stream_format
         self.running = False
 
         # Socket setup
@@ -41,6 +42,19 @@ class UDPVideoClient:
         self.frames_received = 0
         self.start_time = None
         self.last_stats_time = 0
+        
+        # Optional H.264 decoder (PyAV)
+        self.h264_decoder = None
+        self.h264_decoder_error_shown = False
+        self.av = None
+        if self.stream_format == "h264":
+            try:
+                import av
+                self.av = av
+                self.h264_decoder = av.codec.CodecContext.create("h264", "r")
+            except Exception as exc:
+                self.h264_decoder = None
+                self.h264_decoder_error = str(exc)
         
     def send_keepalive(self):
         """Send periodic keep-alive messages"""
@@ -169,7 +183,7 @@ class UDPVideoClient:
                                                 frame_data = bytes(self.pending_frames.pop(frame_id))
                                                 self.expected_chunks.pop(frame_id, None)
                                                 self.received_chunks.pop(frame_id, None)
-                                                self.process_pickled_frame(frame_data)
+                                                self.process_frame_data(frame_data)
                             except Exception:
                                 # Try 32-bit fallback
                                 try:
@@ -190,7 +204,7 @@ class UDPVideoClient:
                                                     frame_data = bytes(self.pending_frames.pop(frame_id))
                                                     self.expected_chunks.pop(frame_id, None)
                                                     self.received_chunks.pop(frame_id, None)
-                                                    self.process_pickled_frame(frame_data)
+                                                    self.process_frame_data(frame_data)
                                 except Exception:
                                     pass
                                     
@@ -212,6 +226,30 @@ class UDPVideoClient:
                 pass
             self.cleanup()
             
+    def show_frame(self, frame):
+        """Overlay stats and display a decoded frame"""
+        if frame is None:
+            return
+        # Increment frame counter
+        self.frames_received += 1
+        
+        # Add frame counter overlay
+        cv2.putText(frame, f"Frames: {self.frames_received}", (10, 30),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+        
+        cv2.imshow('UDP Video Stream', frame)
+        
+        # Check for quit
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            self.running = False
+
+    def process_frame_data(self, frame_data):
+        """Process a reassembled frame based on configured stream format"""
+        if self.stream_format == "h264":
+            self.process_h264_frame(frame_data)
+        else:
+            self.process_pickled_frame(frame_data)
+
     def process_pickled_frame(self, pickled_data):
         """Process pickled JPEG frame data from server"""
         try:
@@ -224,20 +262,26 @@ class UDPVideoClient:
             frame = cv2.imdecode(frame_array, cv2.IMREAD_COLOR)
             
             if frame is not None:
-                # Increment frame counter
-                self.frames_received += 1
-                
-                # Add frame counter overlay
-                cv2.putText(frame, f"Frames: {self.frames_received}", (10, 30), 
-                           cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-                
-                cv2.imshow('UDP Video Stream', frame)
-                
-                # Check for quit
-                if cv2.waitKey(1) & 0xFF == ord('q'):
-                    self.running = False
+                self.show_frame(frame)
         except Exception as e:
             print(f"Frame processing error: {e}")
+
+    def process_h264_frame(self, frame_data):
+        """Process H.264-encoded frame data from server"""
+        if not self.h264_decoder:
+            if not self.h264_decoder_error_shown:
+                print("H.264 mode requires PyAV. Install with: pip install av")
+                if hasattr(self, "h264_decoder_error"):
+                    print(f"Decoder init error: {self.h264_decoder_error}")
+                self.h264_decoder_error_shown = True
+            return
+        try:
+            packet = self.av.packet.Packet(frame_data)
+            for frame in self.h264_decoder.decode(packet):
+                img = frame.to_ndarray(format="bgr24")
+                self.show_frame(img)
+        except Exception as e:
+            print(f"H.264 frame decode error: {e}")
             
     def display_frame(self, compressed_data):
         """Decompress and display frame"""
@@ -376,8 +420,11 @@ if __name__ == "__main__":
             server_port = input("Enter server port (default 9999): ").strip()
             server_port = int(server_port) if server_port else 9999
             
+            stream_format = input("Stream format: 1) Pickled JPEG (default) 2) H264: ").strip()
+            stream_format = "h264" if stream_format == "2" else "jpeg_pickle"
+            
             # Always bind client to UDP 9999
-            client = UDPVideoClient(server_ip, server_port, 9999)
+            client = UDPVideoClient(server_ip, server_port, 9999, stream_format)
             client.start_receiving()
             
         elif choice == "2":
