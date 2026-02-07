@@ -1,24 +1,26 @@
 # Product Requirements Document (PRD)
 
 ## Product Name
-Raspberry Pi Camera Streamer
+Raspberry Pi Camera Streamer + Test Receiver
 
 ## Problem Statement
-We need a product that captures video from a Raspberry Pi compatible camera and encodes it efficiently for internet streaming using a standard format. The current codebase focuses on receiving and displaying JPEG frames over UDP and lacks a production-grade capture, encoding, and streaming pipeline.
+We need a product that captures video from a Raspberry Pi compatible camera, encodes it efficiently, and transmits it to a lightweight receiver running on a Mac laptop for local transmission testing. The current codebase focuses on receiving and displaying JPEG frames over UDP and lacks a production-grade capture, encoding, and streaming pipeline.
 
 ## Key Source Facts From This Project
 - **Camera/Platform**: Raspberry Pi 5 + Pi Camera v2.1
 - **Capture Stack**: Picamera2 is referenced in project docs
+- **Receiver Platform**: macOS laptop for local transmission testing
 
 ## Data Points
 - **Stream Origin**: Video streaming starts on the Raspberry Pi.
-- **Primary Clients**: iOS app (real-time video) and web client.
+- **Primary Clients**: Mac laptop test receiver; iOS app (real-time video) and web client.
 - **Client Preference**: Use standard, native playback stacks over custom protocols.
 
 ## Goals
 - Capture live video from the Pi Camera v2.1 on Raspberry Pi 5.
 - Encode video with an efficient, standard codec suitable for internet streaming.
 - Stream over common protocols with reasonable latency and robustness.
+- Provide a lightweight receiver on macOS to validate transmission and playback.
 - Provide standard player compatibility for iOS and web clients.
 
 ## Non-Goals
@@ -28,6 +30,7 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 
 ## Users
 - Developers building a Pi-based camera stream.
+- Developers testing local transmission to a Mac laptop.
 - End users who view live camera streams on desktop or mobile.
 
 ## Assumptions
@@ -36,26 +39,29 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 - Hardware-accelerated encoding (where available) is preferred.
 
 ## Functional Requirements
-1. **Camera Capture**
+1. **Streamer (Raspberry Pi)**
    - Use Pi Camera v2.1 via `Picamera2`.
    - Support configurable resolution and frame rate (e.g., 1280x720 @ 30 FPS).
-2. **Encoding**
    - Encode using **H.264/AVC** (baseline or main profile).
    - Configurable bitrate, keyframe interval, and profile.
-3. **Transport / Streaming**
    - Streaming originates on the Raspberry Pi.
    - Provide standard protocols that align with native playback stacks:
      - **HLS (prefer Low-Latency HLS)** for native iOS playback.
      - **WebRTC** for real-time browser playback.
    - Allow selecting transport at runtime and enable simultaneous outputs.
    - Serve HLS from a local HTTP server (start with Nginx).
-4. **Client Playback**
+2. **Receiver (macOS test client)**
+   - Run on a Mac laptop to validate local transmission.
+   - Accept the encoded video stream produced by the streamer.
+   - Reassemble chunked frames for UDP-based test mode.
+   - Display received frames with basic stats (FPS, frame count).
+   - Provide CLI options for server IP/port and display settings.
+3. **Client Playback**
    - iOS: Playable in native AVFoundation/AVPlayer.
    - Web: Playable in standard browser media APIs (WebRTC, HTML5 video).
-   - Provide a simple receiver/preview client (CLI is acceptable).
-5. **Configuration**
+4. **Configuration**
    - Single config file (YAML/JSON) or CLI flags for camera + encoding + transport.
-6. **Logging & Metrics**
+5. **Logging & Metrics**
    - Log frame rate, bitrate, and encoder stats.
    - Basic health status (camera ready, streaming active).
 
@@ -78,6 +84,7 @@ We need a product that captures video from a Raspberry Pi compatible camera and 
 ## Constraints
 - Must run on Raspberry Pi 5 OS with Python 3.x.
 - Camera is Pi Camera v2.1, accessed via Picamera2.
+- Receiver must run on macOS with Python 3.x and OpenCV.
 
 ## Out of Scope (for MVP)
 - Multi-user access control or user management.

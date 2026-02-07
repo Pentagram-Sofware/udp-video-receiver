@@ -5,7 +5,7 @@ with Issues (tasks) and explicit dependencies.
 
 ## Projects (Milestones)
 - M0 Decisions and Setup
-- M1 Capture and Encode
+- M1 Capture, Encode, and Test Receiver
 - M2 HLS Streaming
 - M3 WebRTC Streaming
 - M4 Reliability, Config, and Ops
@@ -19,11 +19,13 @@ with Issues (tasks) and explicit dependencies.
 - M0-3 Choose WebRTC stack (GStreamer webrtcbin vs aiortc)
 - M0-4 Environment setup checklist and decision log
 
-### M1 Capture and Encode
-- M1-1 Implement Picamera2 capture (configurable FPS/resolution)
-- M1-2 Implement H.264 encoder config (bitrate/profile/GOP)
-- M1-3 Log FPS/bitrate/encoder status
-- M1-4 Add unit tests for capture/encode config and logging
+### M1 Capture, Encode, and Test Receiver
+- M1-1 Implement Picamera2 capture (configurable FPS/resolution) on Pi
+- M1-2 Implement H.264 encoder config (bitrate/profile/GOP) on Pi
+- M1-3 Implement UDP chunking sender for encoded frames on Pi
+- M1-4 Implement macOS UDP receiver (reassembly + display)
+- M1-5 Log FPS/bitrate/encoder status (Pi) and receive stats (macOS)
+- M1-6 Add unit tests for capture/encode config, UDP chunking, and logging
 
 ### M2 HLS Streaming
 - M2-1 LL-HLS pipeline on Pi (segmenter + playlist)
@@ -68,10 +70,12 @@ M0-1 Validate H264 HW encoder path,Confirm Picamera2 + HW H.264 pipeline on Pi 5
 M0-2 Choose HLS stack,Decide LL-HLS segmenter and HTTP server (Nginx),M0 Decisions and Setup,Todo,High,2,architecture,
 M0-3 Choose WebRTC stack,Decide between GStreamer webrtcbin or aiortc,M0 Decisions and Setup,Todo,Medium,2,architecture,
 M0-4 Setup checklist and decision log,Document tooling setup and decisions,M0 Decisions and Setup,Todo,Medium,2,process,
-M1-1 Picamera2 capture,Configurable FPS and resolution; add unit tests for new logic,M1 Capture and Encode,Todo,High,5,backend,M0-1
-M1-2 H264 encoder config,Bitrate/profile/GOP settings; add unit tests for new logic,M1 Capture and Encode,Todo,High,3,backend,M1-1
-M1-3 Encoder metrics logging,FPS/bitrate/status logging; add unit tests for new logic,M1 Capture and Encode,Todo,Medium,2,observability,M1-2
-M1-4 Unit tests for capture/encode,Add unit tests for capture/encode config and logging,M1 Capture and Encode,Todo,Medium,2,qa,M1-3
+M1-1 Picamera2 capture,Configurable FPS and resolution on Pi; add unit tests for new logic,M1 Capture, Encode, and Test Receiver,Todo,High,5,backend,M0-1
+M1-2 H264 encoder config,Bitrate/profile/GOP settings on Pi; add unit tests for new logic,M1 Capture, Encode, and Test Receiver,Todo,High,3,backend,M1-1
+M1-3 UDP chunking sender,Chunk and send encoded frames over UDP on Pi; add unit tests for new logic,M1 Capture, Encode, and Test Receiver,Todo,High,3,backend,M1-2
+M1-4 macOS UDP receiver,Reassembly + display with FPS stats; add unit tests for new logic,M1 Capture, Encode, and Test Receiver,Todo,High,3,frontend,M1-3
+M1-5 Metrics logging,Log encoder stats on Pi and receive stats on macOS; add unit tests for new logic,M1 Capture, Encode, and Test Receiver,Todo,Medium,2,observability,M1-4
+M1-6 Unit tests for capture/encode/UDP,Add unit tests for capture/encode config, UDP chunking, and logging,M1 Capture, Encode, and Test Receiver,Todo,Medium,2,qa,M1-5
 M2-1 LL-HLS pipeline,Segmenter and playlist generation on Pi; add unit tests for new logic,M2 HLS Streaming,Todo,High,5,streaming,M1-2
 M2-2 Nginx HLS serving,Serve playlists and segments via Nginx; add unit tests for config validation where applicable,M2 HLS Streaming,Todo,High,3,ops,M2-1
 M2-3 iOS + web playback,Validate AVPlayer and browser playback; add unit tests for any playback tooling,M2 HLS Streaming,Todo,High,3,frontend,M2-2

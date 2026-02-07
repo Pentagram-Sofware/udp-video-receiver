@@ -1,6 +1,6 @@
 # UDP Video Receiver Client
 
-A high-performance UDP video streaming client for receiving video streams from Raspberry Pi servers. Supports chunked frame transmission with automatic reassembly for reliable video streaming over local networks and the internet.
+A lightweight UDP video receiver that runs on a local laptop to test streaming from a Raspberry Pi. The client expects H.264-encoded video per the architecture docs and supports chunked frame transmission with automatic reassembly for reliable, low-latency video over a local network.
 
 ## Features
 
