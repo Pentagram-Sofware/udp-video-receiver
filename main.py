@@ -4,6 +4,7 @@ UDP Video Client - receives UDP video streams
 """
 
 import cv2
+import importlib
 import socket
 import struct
 import pickle
@@ -14,12 +15,29 @@ from collections import defaultdict
 
 class UDPVideoClient:
     """Client for client-server UDP streaming"""
-    
-    def __init__(self, server_host, server_port=9999, client_port=9999):
+
+    def __init__(self, server_host, server_port=9999, client_port=9999, stream_format="pickle_jpeg"):
         self.server_host = server_host
         self.server_port = server_port
         self.client_port = client_port  # 0 = auto-assign
+        # Stream format controls how reassembled frames are decoded.
+        self.stream_format = stream_format
         self.running = False
+        self.h264_decoder = None
+        self.av = None
+
+        if self.stream_format == "h264":
+            try:
+                # Optional dependency for H.264 decode.
+                av = importlib.import_module("av")
+            except ImportError as exc:
+                raise RuntimeError(
+                    "H.264 stream selected but PyAV is not installed. "
+                    "Install with: pip install av"
+                ) from exc
+            self.av = av
+            # Decoder context persists across frames for efficiency.
+            self.h264_decoder = av.CodecContext.create("h264", "r")
 
         # Socket setup
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -169,7 +187,7 @@ class UDPVideoClient:
                                                 frame_data = bytes(self.pending_frames.pop(frame_id))
                                                 self.expected_chunks.pop(frame_id, None)
                                                 self.received_chunks.pop(frame_id, None)
-                                                self.process_pickled_frame(frame_data)
+                                                self.process_frame_data(frame_data)
                             except Exception:
                                 # Try 32-bit fallback
                                 try:
@@ -190,7 +208,7 @@ class UDPVideoClient:
                                                     frame_data = bytes(self.pending_frames.pop(frame_id))
                                                     self.expected_chunks.pop(frame_id, None)
                                                     self.received_chunks.pop(frame_id, None)
-                                                    self.process_pickled_frame(frame_data)
+                                                    self.process_frame_data(frame_data)
                                 except Exception:
                                     pass
                                     
@@ -212,6 +230,13 @@ class UDPVideoClient:
                 pass
             self.cleanup()
             
+    def process_frame_data(self, frame_data):
+        """Route frame data to the correct decoder based on stream format."""
+        if self.stream_format == "h264":
+            self.process_h264_frame(frame_data)
+        else:
+            self.process_pickled_frame(frame_data)
+
     def process_pickled_frame(self, pickled_data):
         """Process pickled JPEG frame data from server"""
         try:
@@ -238,6 +263,42 @@ class UDPVideoClient:
                     self.running = False
         except Exception as e:
             print(f"Frame processing error: {e}")
+
+    def process_h264_frame(self, frame_data):
+        """Decode and display H.264 frame data using PyAV."""
+        if self.h264_decoder is None or self.av is None:
+            print("H.264 decoder not initialized. Install PyAV with: pip install av")
+            self.running = False
+            return
+
+        try:
+            # Parse may emit multiple packets; decode each to frames.
+            packets = self.h264_decoder.parse(frame_data)
+            for packet in packets:
+                frames = self.h264_decoder.decode(packet)
+                for frame in frames:
+                    # Convert to OpenCV-friendly BGR array.
+                    image = frame.to_ndarray(format="bgr24")
+                    if image is None:
+                        continue
+
+                    self.frames_received += 1
+                    cv2.putText(
+                        image,
+                        f"Frames: {self.frames_received}",
+                        (10, 30),
+                        cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7,
+                        (0, 255, 0),
+                        2,
+                    )
+
+                    cv2.imshow('UDP Video Stream', image)
+
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        self.running = False
+        except Exception as e:
+            print(f"H.264 frame processing error: {e}")
             
     def display_frame(self, compressed_data):
         """Decompress and display frame"""
@@ -375,9 +436,13 @@ if __name__ == "__main__":
                 
             server_port = input("Enter server port (default 9999): ").strip()
             server_port = int(server_port) if server_port else 9999
+
+            # Default to legacy pickle+JPEG if unspecified.
+            stream_format_input = input("Stream format (jpeg/h264, default jpeg): ").strip().lower()
+            stream_format = "h264" if stream_format_input == "h264" else "pickle_jpeg"
             
             # Always bind client to UDP 9999
-            client = UDPVideoClient(server_ip, server_port, 9999)
+            client = UDPVideoClient(server_ip, server_port, 9999, stream_format=stream_format)
             client.start_receiving()
             
         elif choice == "2":
