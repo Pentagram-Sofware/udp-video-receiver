@@ -33,7 +33,6 @@ pip install opencv-python numpy
    git clone https://github.com/yourusername/udp-video-receiver.git
    cd udp-video-receiver
    ```
-1.a This is an additional step for pull request only
 2. **Install dependencies**:
    ```bash
    pip install -r requirements.txt
