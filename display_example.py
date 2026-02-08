@@ -17,8 +17,8 @@ import cv2
 class UDPClientWithEnhancedDisplay(UDPVideoClient):
     """Extended UDP client that uses the enhanced video display"""
     
-    def __init__(self, server_host, server_port=9999, client_port=0):
-        super().__init__(server_host, server_port, client_port)
+    def __init__(self, server_host, server_port=9999, client_port=0, stream_format="pickle_jpeg"):
+        super().__init__(server_host, server_port, client_port, stream_format=stream_format)
         
         # Replace the basic display with enhanced display
         self.video_display = VideoDisplay("Enhanced Stream View", (1024, 768))
@@ -83,6 +83,31 @@ class UDPClientWithEnhancedDisplay(UDPVideoClient):
                     
         except Exception as e:
             print(f"Frame processing error: {e}")
+
+    def process_h264_frame(self, frame_data):
+        """Override to decode H.264 frames for the enhanced display."""
+        if self.h264_decoder is None:
+            print("H.264 decoder not initialized. Install PyAV with: pip install av")
+            self.running = False
+            return
+
+        try:
+            # Parse and decode H.264 data to displayable frames.
+            packets = self.h264_decoder.parse(frame_data)
+            for packet in packets:
+                frames = self.h264_decoder.decode(packet)
+                for frame in frames:
+                    image = frame.to_ndarray(format="bgr24")
+                    if image is None:
+                        continue
+
+                    self.frames_received += 1
+                    self.video_display.update_frame(image)
+
+                    if not self.video_display.running:
+                        self.running = False
+        except Exception as e:
+            print(f"H.264 frame processing error: {e}")
             
     def cleanup(self):
         """Override cleanup to stop enhanced display"""
@@ -120,8 +145,16 @@ def main():
         client_port = input("Enter client port (default auto-assign): ").strip()
         client_port = int(client_port) if client_port else 0
         
+        stream_format_input = input("Stream format (jpeg/h264, default jpeg): ").strip().lower()
+        stream_format = "h264" if stream_format_input == "h264" else "pickle_jpeg"
+
         # Create and start enhanced client
-        client = UDPClientWithEnhancedDisplay(server_ip, server_port, client_port)
+        client = UDPClientWithEnhancedDisplay(
+            server_ip,
+            server_port,
+            client_port,
+            stream_format=stream_format,
+        )
         client.start_receiving()
         
     except KeyboardInterrupt:
